@@ -1,0 +1,63 @@
+---
+title: "Manual21005"
+author: "Jinhao Zhao"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Manual21005}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+## Overview
+
+__StatComp21005__ is a simple R package developed for simple linear fitting of independent and dependent variables. Two functions are _Gradient_Descent_ and _Stochastic_GD_.
+
+## _Gradient_Descent_
+
+The running time of _Gradient_Descent_ is short, but the result may fall into local minimum.
+The source R code is as follows:
+
+```{r}
+Gradient_Descent<-function(x,y,learning_rate){
+  x0=rep(1,length(x))
+  x_data=cbind(x0,x) 
+  y_data=matrix(y,length(y),1)
+  theta=matrix(c(1,1),2,1)
+  diff=x_data%*%theta-y_data 
+  gradient=(1/length(x))*(t(x_data)%*%diff)
+  while (!((abs(gradient[1,1])<0.0001)&(abs(gradient[2,1])<0.0001))) {
+    theta=theta-learning_rate*gradient
+    diff=x_data%*%theta-y_data 
+    gradient=(1/length(x))*(t(x_data)%*%diff)
+  }
+  func=paste('y=',theta[1,1],'+',theta[2,1],'x')
+  return (func)
+}
+```
+
+## Introduction about _Stochastic_GD_
+
+The running time of _Stochastic_GD_ may be long, but the result is unlikely to fall into a local minimum. 
+The source R code is as follows:
+
+```{r}
+Stochastic_GD<-function(x,y,learning_rate){
+  x0=rep(1,length(x))
+  x_data=cbind(x0,x)
+  y_data=matrix(y,length(y),1)
+  theta=matrix(c(1,1),2,1)
+  i=sample(1:nrow(x_data),1)
+  diff=x_data[i,]%*%theta-y_data[i,]
+  gradient=(x_data[i,])%*%diff
+  while (!((abs(gradient[1,1])<1e-5)&(abs(gradient[2,1])<1e-5))){
+    theta=theta-learning_rate*gradient
+    j=sample(1:nrow(x_data),1)
+    diff=x_data[j,]%*%theta-y_data[j,]
+    gradient=(x_data[j,])%*%diff
+  }
+  func=paste('y=',theta[1,1],'+',theta[2,1],'x')
+  return (func)
+}
+```
+
+
